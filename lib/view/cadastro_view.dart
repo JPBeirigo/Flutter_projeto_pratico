@@ -54,7 +54,7 @@ class _CadastroViewState extends State<CadastroView> {
 
 // Redireciona após um pequeno delay para o usuário ver a mensagem
 Future.delayed(Duration(seconds: 1), () {
-  Navigator.pushNamed(context, 'exibicao');
+  Navigator.pushNamed(context, 'login');
 });
 
   }

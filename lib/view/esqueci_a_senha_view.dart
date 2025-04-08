@@ -38,7 +38,7 @@ class _EsqueciSenhaViewState extends State<EsqueciASenhaView> {
     ),
   );
 
-  // Voltar para a tela de login após alguns segundos (opcional)
+  // Voltar para a tela de login após alguns segundos 
   Future.delayed(Duration(seconds: 3), () {
     Navigator.pop(context, 'login');
   });
