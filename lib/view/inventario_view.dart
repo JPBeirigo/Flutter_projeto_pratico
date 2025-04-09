@@ -31,10 +31,10 @@ class _InventarioViewState extends State<InventarioView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFEFEBE9), // fundo bege claro
+      backgroundColor: const Color(0xFFEFEBE9),
       appBar: AppBar(
         title: Text('Inventário'),
-        backgroundColor: const Color(0xFF6D4C41), // marrom escuro
+        backgroundColor: const Color(0xFF6D4C41),
       ),
       body: itens.isEmpty
           ? Center(

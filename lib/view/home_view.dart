@@ -58,7 +58,7 @@ class HomeView extends StatelessWidget {
       borderRadius: BorderRadius.circular(16),
       child: Container(
         decoration: BoxDecoration(
-          color: Color(0xFFD7CCC8), // tom de papel envelhecido
+          color: Color(0xFFD7CCC8), 
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -71,7 +71,7 @@ class HomeView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 48, color: Color(0xFF6D4C41)), // marrom escuro
+            Icon(icon, size: 48, color: Color(0xFF6D4C41)), 
             SizedBox(height: 10),
             Text(
               label,

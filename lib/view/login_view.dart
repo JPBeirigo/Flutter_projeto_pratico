@@ -26,7 +26,7 @@ void initState() {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF1E1B18), // fundo escuro elegante
+      backgroundColor: Color(0xFF1E1B18), 
       appBar: AppBar(
         backgroundColor: Color(0xFF3E2C24),
         title: Text('Dark Sun',style: TextStyle(color: Colors.amber[200])),

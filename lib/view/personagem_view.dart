@@ -6,10 +6,10 @@ class PersonagemView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFECEFF1), // Cinza bem claro
+      backgroundColor: const Color(0xFFECEFF1),
       appBar: AppBar(
         title: Text('Personagem'),
-        backgroundColor: const Color(0xFF37474F), // Grafite metálico
+        backgroundColor: const Color(0xFF37474F), 
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
@@ -36,7 +36,7 @@ class PersonagemView extends StatelessWidget {
               icon: Icon(Icons.edit, color: Colors.grey.shade800),
               label: Text('Editar Ficha', style: TextStyle(color: Colors.grey.shade800)),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey.shade300, // prata clara
+                backgroundColor: Colors.grey.shade300, 
                 padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 elevation: 2,
               ),
@@ -49,7 +49,7 @@ class PersonagemView extends StatelessWidget {
 
   Widget _buildCardInfoPersonagem() {
     return Card(
-      color: Color(0xFFCFD8DC), // cinza metálico
+      color: Color(0xFFCFD8DC), 
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 6,
       child: Padding(
@@ -116,7 +116,7 @@ class PersonagemView extends StatelessWidget {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 6,
-      color: Colors.red.shade100, // leve vermelho para destaque
+      color: Colors.red.shade100, 
       child: Padding(
         padding: EdgeInsets.all(16),
         child: Row(
@@ -139,7 +139,7 @@ class PersonagemView extends StatelessWidget {
   Widget _buildInfoTile(IconData icon, String label, String value) {
     return Column(
       children: [
-        Icon(icon, size: 32, color: Color(0xFF546E7A)), // azul metálico acinzentado
+        Icon(icon, size: 32, color: Color(0xFF546E7A)), 
         SizedBox(height: 4),
         Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
         Text(value),
