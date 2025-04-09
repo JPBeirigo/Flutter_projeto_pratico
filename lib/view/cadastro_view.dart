@@ -52,7 +52,6 @@ class _CadastroViewState extends State<CadastroView> {
   SnackBar(content: Text('Cadastro realizado com sucesso!')),
 );
 
-// Redireciona após um pequeno delay para o usuário ver a mensagem
 Future.delayed(Duration(seconds: 1), () {
   Navigator.pushNamed(context, 'login');
 });
@@ -64,10 +63,20 @@ Future.delayed(Duration(seconds: 1), () {
   }
 
   @override
-  void initState() {
-    super.initState();
-    ctrl.addListener(() => setState(() {}));
-  }
+void initState() {
+  super.initState();
+
+  // Limpa os campos ao entrar na tela
+  ctrl.txtNome.clear();
+  ctrl.txtEmail.clear();
+  ctrl.txtTelefone.clear();
+  ctrl.txtSenha.clear();
+  txtConfirmaSenha.clear();
+  ctrl.setAceitarTermos(false);
+
+  ctrl.addListener(() => setState(() {}));
+}
+
 
   @override
   void dispose() {

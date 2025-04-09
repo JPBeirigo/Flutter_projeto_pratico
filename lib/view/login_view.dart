@@ -13,10 +13,15 @@ class _LoginViewState extends State<LoginView> {
   final ctrl = GetIt.I.get<LoginController>();
 
   @override
-  void initState() {
-    super.initState();
-    ctrl.addListener(() => setState(() {}));
-  }
+void initState() {
+  super.initState();
+
+  ctrl.txtEmail.clear();
+  ctrl.txtSenha.clear();
+
+  ctrl.addListener(() => setState(() {}));
+}
+
 
   @override
   Widget build(BuildContext context) {
