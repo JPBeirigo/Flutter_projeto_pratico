@@ -1,45 +1,81 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'editar_personagem_view.dart';
 
-class PersonagemView extends StatelessWidget {
+class PersonagemView extends StatefulWidget {
   const PersonagemView({super.key});
 
   @override
+  State<PersonagemView> createState() => _PersonagemViewState();
+}
+
+class _PersonagemViewState extends State<PersonagemView> {
+  Map<String, dynamic>? dadosPersonagem;
+
+  @override
+  void initState() {
+    super.initState();
+    _carregarDados();
+  }
+
+  Future<void> _carregarDados() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+
+    final doc = await FirebaseFirestore.instance
+        .collection('personagens')
+        .doc(uid)
+        .get();
+
+    if (doc.exists) {
+      setState(() {
+        dadosPersonagem = doc.data();
+      });
+    }
+  }
+
+  void _abrirTelaEdicao() async {
+    final atualizado = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => EditarPersonagemView()),
+    );
+    if (atualizado == true) {
+      _carregarDados();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final personagem = dadosPersonagem ?? {
+      'nome': '',
+      'classe': '',
+      'raca': '',
+      'nivel': '',
+      'vidaAtual': '',
+      'vidaMaxima': '',
+      'atributos': {
+        'Força': '', 'Destreza': '', 'Constituição': '',
+        'Inteligência': '', 'Sabedoria': '', 'Carisma': ''
+      },
+    };
+
     return Scaffold(
-      backgroundColor: const Color(0xFFECEFF1),
-      appBar: AppBar(
-        title: Text('Personagem'),
-        backgroundColor: const Color(0xFF37474F), 
-      ),
+      appBar: AppBar(title: Text('Personagem')),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
         child: Column(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
-                'lib/assets/images/personagem.png',
-                height: 200,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-            ),
+            _buildCardInfoPersonagem(personagem),
             SizedBox(height: 16),
-            _buildCardInfoPersonagem(),
+            _buildCardAtributos(personagem['atributos']),
             SizedBox(height: 16),
-            _buildCardAtributos(),
-            SizedBox(height: 16),
-            _buildCardVida(),
+            _buildCardVida(personagem['vidaAtual'], personagem['vidaMaxima']),
             SizedBox(height: 20),
             ElevatedButton.icon(
-              onPressed: () {},
-              icon: Icon(Icons.edit, color: Colors.grey.shade800),
-              label: Text('Editar Ficha', style: TextStyle(color: Colors.grey.shade800)),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey.shade300, 
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                elevation: 2,
-              ),
+              onPressed: _abrirTelaEdicao,
+              icon: Icon(Icons.edit),
+              label: Text('Editar Ficha'),
             ),
           ],
         ),
@@ -47,23 +83,20 @@ class PersonagemView extends StatelessWidget {
     );
   }
 
-  Widget _buildCardInfoPersonagem() {
+  Widget _buildCardInfoPersonagem(Map<String, dynamic> personagem) {
     return Card(
-      color: Color(0xFFCFD8DC), 
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 6,
       child: Padding(
         padding: EdgeInsets.all(16),
         child: Column(
           children: [
-            Text('Tharion, o Bravo', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87)),
+            Text(personagem['nome'] ?? '', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildInfoTile(Icons.shield, 'Classe', 'Guerreiro'),
-                _buildInfoTile(Icons.pets, 'Raça', 'Humano'),
-                _buildInfoTile(Icons.stars, 'Nível', '5'),
+                _buildInfoTile(Icons.shield, 'Classe', personagem['classe'] ?? ''),
+                _buildInfoTile(Icons.pets, 'Raça', personagem['raca'] ?? ''),
+                _buildInfoTile(Icons.stars, 'Nível', personagem['nivel'] ?? ''),
               ],
             ),
           ],
@@ -72,25 +105,13 @@ class PersonagemView extends StatelessWidget {
     );
   }
 
-  Widget _buildCardAtributos() {
-    final atributos = {
-      'Força': '16',
-      'Destreza': '12',
-      'Constituição': '14',
-      'Inteligência': '10',
-      'Sabedoria': '8',
-      'Carisma': '13',
-    };
-
+  Widget _buildCardAtributos(Map atributos) {
     return Card(
-      color: Color(0xFFCFD8DC),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 6,
       child: Padding(
         padding: EdgeInsets.all(16),
         child: Column(
           children: [
-            Text('Atributos', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87)),
+            Text('Atributos', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             SizedBox(height: 10),
             GridView.count(
               crossAxisCount: 3,
@@ -101,7 +122,7 @@ class PersonagemView extends StatelessWidget {
                   .map((e) => Column(
                         children: [
                           Text(e.key, style: TextStyle(fontWeight: FontWeight.bold)),
-                          Text(e.value),
+                          Text(e.value.toString()),
                         ],
                       ))
                   .toList(),
@@ -112,11 +133,9 @@ class PersonagemView extends StatelessWidget {
     );
   }
 
-  Widget _buildCardVida() {
+  Widget _buildCardVida(String atual, String maximo) {
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 6,
-      color: Colors.red.shade100, 
+      color: Colors.red.shade100,
       child: Padding(
         padding: EdgeInsets.all(16),
         child: Row(
@@ -127,7 +146,7 @@ class PersonagemView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Pontos de Vida', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                Text('38 / 45', style: TextStyle(fontSize: 18)),
+                Text('$atual / $maximo', style: TextStyle(fontSize: 18)),
               ],
             ),
           ],
@@ -139,7 +158,7 @@ class PersonagemView extends StatelessWidget {
   Widget _buildInfoTile(IconData icon, String label, String value) {
     return Column(
       children: [
-        Icon(icon, size: 32, color: Color(0xFF546E7A)), 
+        Icon(icon, size: 32),
         SizedBox(height: 4),
         Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
         Text(value),

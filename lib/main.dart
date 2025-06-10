@@ -1,4 +1,5 @@
 import 'package:device_preview/device_preview.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/controller/cadastro_controller.dart';
 import 'package:flutter_application_1/controller/login_controller.dart';
@@ -14,23 +15,24 @@ import 'package:flutter_application_1/view/rolagem_dados_view.dart';
 import 'package:flutter_application_1/view/sobre_view.dart';
 import 'package:flutter_application_1/view/turn_order_view.dart';
 import 'package:get_it/get_it.dart';
+import 'firebase_options.dart';
 
 final g = GetIt.instance;
 
-void main() {
-
-  //Registrar o gerenciador de estados
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   g.registerSingleton<CadastroController>(CadastroController());
   g.registerSingleton<LoginController>(LoginController());
 
-
-
   runApp(DevicePreview(
     builder: (context) => const MainApp(),
-  ),
-  );
+  ));
 }
+
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});

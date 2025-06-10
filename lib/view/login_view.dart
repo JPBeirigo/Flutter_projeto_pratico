@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import '../controller/login_controller.dart';
@@ -115,12 +116,11 @@ void initState() {
             ]),
             SizedBox(height: 30),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 final email = ctrl.txtEmail.text.trim();
                 final senha = ctrl.txtSenha.text.trim();
 
-                final emailValido = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$")
-                    .hasMatch(email);
+                final emailValido = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(email);
 
                 if (email.isEmpty || senha.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -136,15 +136,29 @@ void initState() {
                   return;
                 }
 
-                Navigator.pushNamed(context, 'home');
+                try {
+                  await FirebaseAuth.instance.signInWithEmailAndPassword(
+                    email: email,
+                    password: senha,
+                  );
+                  Navigator.pushNamed(context, 'home');
+                } on FirebaseAuthException catch (e) {
+                  String mensagem = 'Erro ao fazer login.';
+                  if (e.code == 'user-not-found') {
+                    mensagem = 'Usuário não encontrado.';
+                  } else if (e.code == 'wrong-password') {
+                    mensagem = 'Senha incorreta.';
+                  }
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensagem)));
+                }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.amber[800],
                 padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
                 textStyle: TextStyle(fontSize: 20),
               ),
               child: Text('Entrar'),
-            ),
+            )
+            ,
           ],
         ),
       ),

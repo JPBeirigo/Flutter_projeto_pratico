@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class EsqueciASenhaView extends StatefulWidget {
   const EsqueciASenhaView({super.key});
@@ -10,72 +11,72 @@ class EsqueciASenhaView extends StatefulWidget {
 class _EsqueciSenhaViewState extends State<EsqueciASenhaView> {
   final txtEmail = TextEditingController();
 
-  void _enviarEmailRecuperacao() {
-  final email = txtEmail.text.trim();
-  final emailValido = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(email);
+  void _enviarEmailRecuperacao() async {
+    final email = txtEmail.text.trim();
+    final emailValido = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(email);
 
-  if (email.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Por favor, preencha o campo de e-mail.')),
-    );
-    return;
-  }
+    if (email.isEmpty) {
+      _mostrarMensagem('Por favor, preencha o campo de e-mail.');
+      return;
+    }
 
-  if (!emailValido) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Digite um e-mail válido.')),
-    );
-    return;
-  }
+    if (!emailValido) {
+      _mostrarMensagem('Digite um e-mail válido.');
+      return;
+    }
 
-  // Mensagem de sucesso com feedback claro
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text(
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      _mostrarMensagem(
         'Se o e-mail informado estiver cadastrado, enviaremos um link para redefinir sua senha.',
-      ),
-      duration: Duration(seconds: 3),
-    ),
-  );
+      );
 
-  // Voltar para a tela de login após alguns segundos 
-  Future.delayed(Duration(seconds: 3), () {
-    Navigator.pop(context, 'login');
-  });
-}
+      Future.delayed(const Duration(seconds: 3), () {
+        Navigator.pop(context); // Volta para a tela de login
+      });
+    } catch (e) {
+      _mostrarMensagem('Erro ao enviar e-mail. Verifique o endereço digitado.');
+    }
+  }
 
+  void _mostrarMensagem(String mensagem) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(mensagem)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Recuperar Senha')),
+      appBar: AppBar(title: const Text('Recuperar Senha')),
       body: Padding(
-        padding: EdgeInsets.all(30),
+        padding: const EdgeInsets.all(30),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SizedBox(height: 40),
-            Text(
-              'Digite o e-mail associado a conta de que deseja recuperar acesso, será enviado um link para redefinir a senha',
+            const SizedBox(height: 40),
+            const Text(
+              'Digite o e-mail associado à conta que deseja recuperar. Enviaremos um link para redefinir sua senha.',
               style: TextStyle(fontSize: 16),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             TextField(
               controller: txtEmail,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'E-mail',
                 labelStyle: TextStyle(fontSize: 18),
                 prefixIcon: Icon(Icons.email),
               ),
+              keyboardType: TextInputType.emailAddress,
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             ElevatedButton(
               onPressed: _enviarEmailRecuperacao,
               style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(vertical: 16),
-                textStyle: TextStyle(fontSize: 18),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                textStyle: const TextStyle(fontSize: 18),
               ),
-              child: Text('Enviar link de recuperação'),
+              child: const Text('Enviar link de recuperação'),
             ),
           ],
         ),

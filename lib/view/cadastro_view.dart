@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../controller/cadastro_controller.dart';
 
 class CadastroView extends StatefulWidget {
@@ -13,7 +15,7 @@ class _CadastroViewState extends State<CadastroView> {
   final ctrl = GetIt.I.get<CadastroController>();
   final txtConfirmaSenha = TextEditingController();
 
-  void _validarCadastro() {
+  void _validarCadastro() async {
     final nome = ctrl.txtNome.text.trim();
     final email = ctrl.txtEmail.text.trim();
     final telefone = ctrl.txtTelefone.text.trim();
@@ -48,14 +50,32 @@ class _CadastroViewState extends State<CadastroView> {
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-  SnackBar(content: Text('Cadastro realizado com sucesso!')),
-);
+    try {
+      // Criação do usuário no Firebase Auth
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: senha);
 
-Future.delayed(Duration(seconds: 1), () {
-  Navigator.pushNamed(context, 'login');
-});
+      // Salvar dados adicionais no Firestore
+      await FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(userCredential.user!.uid)
+          .set({
+            'nome': nome,
+            'email': email,
+            'telefone': telefone,
+            'uid': userCredential.user!.uid,
+            'criadoEm': FieldValue.serverTimestamp(),
+          });
 
+      _mostrarMensagem('Cadastro realizado com sucesso!');
+      Future.delayed(Duration(seconds: 2), () {
+        Navigator.pushNamed(context, 'login');
+      });
+    } on FirebaseAuthException catch (e) {
+      _mostrarMensagem('Erro ao cadastrar: ${e.message}');
+    } catch (e) {
+      _mostrarMensagem('Erro inesperado: $e');
+    }
   }
 
   void _mostrarMensagem(String mensagem) {
@@ -63,20 +83,16 @@ Future.delayed(Duration(seconds: 1), () {
   }
 
   @override
-void initState() {
-  super.initState();
-
-  // Limpa os campos ao entrar na tela
-  ctrl.txtNome.clear();
-  ctrl.txtEmail.clear();
-  ctrl.txtTelefone.clear();
-  ctrl.txtSenha.clear();
-  txtConfirmaSenha.clear();
-  ctrl.setAceitarTermos(false);
-
-  ctrl.addListener(() => setState(() {}));
-}
-
+  void initState() {
+    super.initState();
+    ctrl.txtNome.clear();
+    ctrl.txtEmail.clear();
+    ctrl.txtTelefone.clear();
+    ctrl.txtSenha.clear();
+    txtConfirmaSenha.clear();
+    ctrl.setAceitarTermos(false);
+    ctrl.addListener(() => setState(() {}));
+  }
 
   @override
   void dispose() {
