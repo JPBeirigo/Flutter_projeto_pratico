@@ -1,5 +1,6 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart'; // Necessário para kIsWeb
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/controller/cadastro_controller.dart';
 import 'package:flutter_application_1/controller/login_controller.dart';
@@ -29,10 +30,10 @@ void main() async {
   g.registerSingleton<LoginController>(LoginController());
 
   runApp(DevicePreview(
+    enabled: !kIsWeb, // Desativa no Web
     builder: (context) => const MainApp(),
   ));
 }
-
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
@@ -42,23 +43,23 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'App',
-
-       //Rotas de Navegação
+      useInheritedMediaQuery: true, // Necessário com DevicePreview
+      locale: DevicePreview.locale(context),
+      builder: DevicePreview.appBuilder,
       initialRoute: 'login',
       routes: {
-        'home' :  (context) => const HomeView(),
-        'cadastro' : (context) => const CadastroView(),
-        'login' : (context) => const LoginView(),
-        'esqueci_a_senha' : (context) => const EsqueciASenhaView(),
-        'sobre' : (context) => const SobreView(),
-        'personagem' : (context) => const PersonagemView(),
-        'inventario' : (context) => const InventarioView(),
-        'turn_order' : (context) => const TurnOrderView(),
-        'grimorio' : (context) => const GrimorioView(),
-        'dados' : (context) => const RolagemDadosView(),
-        'journal' : (context) => const JournalView(),
-          
+        'home': (context) => const HomeView(),
+        'cadastro': (context) => const CadastroView(),
+        'login': (context) => const LoginView(),
+        'esqueci_a_senha': (context) => const EsqueciASenhaView(),
+        'sobre': (context) => const SobreView(),
+        'personagem': (context) => const PersonagemView(),
+        'inventario': (context) => const InventarioView(),
+        'turn_order': (context) => const TurnOrderView(),
+        'grimorio': (context) => const GrimorioView(),
+        'dados': (context) => const RolagemDadosView(),
+        'journal': (context) => const JournalView(),
       },
-    ); 
+    );
   }
 }
